@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Todo;
 use App\Form\TodoType;
+use App\Form\TodoFilterType;
 use App\Repository\TodoRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,14 +17,44 @@ use Symfony\Component\Routing\Annotation\Route;
 class TodoController extends AbstractController
 {
     /**
-     * @Route("/", name="app_todo_index", methods={"GET"})
+     * @Route("/", name="app_todo_index", methods={"GET", "POST"})
      */
-    public function index(TodoRepository $todoRepository): Response
+    public function index(TodoRepository $todoRepository, Request $request): Response
     {
-        return $this->render('todo/index.html.twig', [
-            'todos' => $todoRepository->findAll(),
-        ]);
-    }
+        $form = $this->createForm(
+            TodoFilterType::class
+        );
+        $filterBy = [];
+        $form->handleRequest($request);
+        if($form->isSubmitted())
+        {
+           // dump($form->getData('A_Faire'));
+            $filter = $form->getData('A_Faire');
+            $filterBy = ["isDone" => $filter];
+
+            return $this->render('todo/index.html.twig', [
+                'todos' => $todoRepository->findBy($filterBy, []),
+                'form' => $form->createView()
+            ]);
+        }
+
+        $order = $request->query->get('order');
+        $orderby = $request->query->get('orderby');
+
+        if(isset($order) && isset($orderby)){
+            $criteria = [$orderby => $order];
+            return $this->render('todo/index.html.twig', [
+                'todos' => $todoRepository->findBy([], $criteria),
+                'form' => $form->createView()
+            ]);
+        }
+        else{
+            return $this->render('todo/index.html.twig', [
+                'todos' => $todoRepository->findAll(),
+                'form' => $form->createView()
+            ]);
+        }
+    } 
 
     /**
      * @Route("/new", name="app_todo_new", methods={"GET", "POST"})
