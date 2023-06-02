@@ -32,6 +32,11 @@ class Todo
      */
     private $isDone;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Priority::class, inversedBy="todos")
+     */
+    private $Priority;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -69,6 +74,18 @@ class Todo
     public function setIsDone(bool $isDone): self
     {
         $this->isDone = $isDone;
+
+        return $this;
+    }
+
+    public function getPriority(): ?Priority
+    {
+        return $this->Priority;
+    }
+
+    public function setPriority(?Priority $Priority): self
+    {
+        $this->Priority = $Priority;
 
         return $this;
     }

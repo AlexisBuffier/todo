@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20230530091229 extends AbstractMigration
+final class Version20230602121919 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,12 +20,16 @@ final class Version20230530091229 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE todo ADD description LONGTEXT DEFAULT NULL');
+        $this->addSql('ALTER TABLE todo ADD priority_id INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE todo ADD CONSTRAINT FK_5A0EB6A0497B19F9 FOREIGN KEY (priority_id) REFERENCES priority (id)');
+        $this->addSql('CREATE INDEX IDX_5A0EB6A0497B19F9 ON todo (priority_id)');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE todo DROP description');
+        $this->addSql('ALTER TABLE todo DROP FOREIGN KEY FK_5A0EB6A0497B19F9');
+        $this->addSql('DROP INDEX IDX_5A0EB6A0497B19F9 ON todo');
+        $this->addSql('ALTER TABLE todo DROP priority_id');
     }
 }
